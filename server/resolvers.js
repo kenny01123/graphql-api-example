@@ -21,6 +21,36 @@ module.exports = {
       );
     },
 
+    FindPokemonByAttack: (parent, args) => {
+      const pokemon = [];
+      //logging the attack infops
+
+      for (const element of data.attacks.fast) {
+        if (element.name === args.attack) {
+          name = element.name;
+          type = element.type;
+          damage = element.damage;
+        }
+      }
+      for (const element of data.attacks.special) {
+        if (element.name === args.attack) {
+          name = element.name;
+          type = element.type;
+          damage = element.damage;
+        }
+      }
+      //to find the list of pokemons with the attack
+      for (const element of data.pokemon) {
+        for (const attack of element.attacks.fast) {
+          if (args.attack === attack.name) pokemon.push(element);
+        }
+        for (const attack of element.attacks.special) {
+          if (args.attack === attack.name) pokemon.push(element);
+        }
+      }
+      return { name, type, damage, pokemon };
+    },
+
     Attacks: () => {
       return data.attacks;
     },
@@ -44,11 +74,108 @@ module.exports = {
     Types: () => {
       return data.types;
     },
-    /*  findFast: (parent, args) => {
-      return data.attacks.fast.find((attacks) => attacks.name === args.name);
+  },
+
+  Mutation: {
+    DeletePokemon: (parents, args) => {
+      let index = data.pokemon.findIndex(
+        (pokemon) => pokemon.name === args.name
+      );
+      return data.pokemon.splice(index, 1);
     },
-    Types: () => {
-      return data.pokemon;
-    }, */
+
+    EditPokemon: (parents, args) => {
+      let targetIndex = data.pokemon.findIndex(
+        (pokemon) => pokemon.name === args.name
+      );
+      for (const key in args.edit) {
+        data.pokemon[targetIndex][key] = args.edit[key];
+      }
+      return data.pokemon[targetIndex];
+    },
+
+    InsertPokemon: (parents, args) => {
+      let newPokemon = args.input;
+      data.pokemon.push(newPokemon);
+      return newPokemon;
+    },
+
+    DeleteType: (parents, args) => {
+      let index = data.types.indexOf(args.type);
+      return data.types.splice(index, 1);
+    },
+
+    EditType: (parents, args) => {
+      let index = data.types.indexOf(args.type);
+      return (data.types[index] = args.newName);
+    },
+
+    InsertType: (parents, args) => {
+      data.types.push(args.type);
+      return data.types[data.types.length - 1];
+    },
+
+    DeleteAttack: (parents, args) => {
+      let fastIndex = null;
+      let specialIndex = null;
+      if (
+        data.attacks.fast.findIndex((attack) => attack.name === args.name) > -1
+      ) {
+        fastIndex = data.attacks.fast.findIndex(
+          (attack) => attack.name === args.name
+        );
+        return data.attacks.fast.splice(fastIndex, 1);
+      }
+
+      if (
+        data.attacks.special.findIndex((attack) => attack.name === args.name) >
+        -1
+      ) {
+        specialIndex = data.attacks.special.findIndex(
+          (attack) => attack.name === args.name
+        );
+        return data.attacks.special.splice(specialIndex, 1);
+      }
+      return "No Attack found";
+    },
+
+    EditAttack: (parents, args) => {
+      let fastIndex = null;
+      let specialIndex = null;
+      if (
+        data.attacks.fast.findIndex((attack) => attack.name === args.name) > -1
+      ) {
+        fastIndex = data.attacks.fast.findIndex(
+          (attack) => attack.name === args.name
+        );
+        for (let key in args.edit) {
+          data.attacks.fast[fastIndex][key] = args.edit[key];
+        }
+        return data.attacks.fast[fastIndex];
+      }
+      if (
+        data.attacks.special.findIndex((attack) => attack.name === args.name) >
+        -1
+      ) {
+        specialIndex = data.attacks.special.findIndex(
+          (attack) => attack.name === args.name
+        );
+        for (let key in args.edit) {
+          data.attacks.special[specialIndex][key] = args.edit[key];
+        }
+        return data.attacks.special[specialIndex];
+      }
+    },
+
+    InsertAttack: (parents, args) => {
+      if (args.class === "fast") {
+        data.attacks.fast.push(args.input);
+        return data.attacks.fast[data.attacks.fast.length - 1];
+      }
+      if (args.class === "special") {
+        data.attacks.special.push(args.input);
+        return data.attacks.special[data.attacks.special.length - 1];
+      }
+    },
   },
 };

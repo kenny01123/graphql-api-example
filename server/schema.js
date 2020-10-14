@@ -50,15 +50,83 @@ const typeDefs = gql`
     damage: Int
   }
 
+  type pokemonByAttack {
+    name: String
+    type: String
+    damage: Int
+    pokemon: [Pokemon]
+  }
+
   type Query {
     Pokemons: [Pokemon]
     FindPokemonByName(name: String!): Pokemon
     FindPokemonById(id: String!): Pokemon
     FindPokemonByType(type: String!): [Pokemon]
+    FindPokemonByAttack(attack: String!): pokemonByAttack
     Attacks: Attacks
     FindAttacksByClass(name: String!): [oneAttack]
     FindAttacksByName(name: String!): oneAttack
     Types: [String]
+  }
+
+  input PokeInput {
+    id: String
+    name: String
+    classification: String
+    types: [String]
+    height: HeightInput
+    weight: WeightInput
+    evolutionRequirements: EvolutionRequirementInput
+    previousEvolutions: [EvolutionsInput]
+    evolutions: [EvolutionsInput]
+    maxCP: Int
+    maxHP: Int
+    attacks: AttacksInput
+  }
+
+  input HeightInput {
+    minimum: String
+    maximum: String
+  }
+
+  input WeightInput {
+    minimum: String
+    maximum: String
+  }
+
+  input EvolutionsInput {
+    id: Int!
+    name: String
+  }
+
+  input EvolutionRequirementInput {
+    amount: Int!
+    name: String!
+  }
+
+  input AttacksInput {
+    fast: [oneAttackInput]
+    special: [oneAttackInput]
+  }
+
+  input oneAttackInput {
+    name: String
+    type: String
+    damage: Int
+  }
+
+  type Mutation {
+    DeletePokemon(name: String!): [Pokemon]
+    EditPokemon(name: String!, edit: PokeInput): Pokemon
+    InsertPokemon(input: PokeInput): Pokemon
+
+    DeleteType(type: String!): [String]
+    EditType(type: String!, newName: String!): String
+    InsertType(type: String!): String
+
+    DeleteAttack(name: String!): oneAttack
+    EditAttack(name: String!, edit: oneAttackInput): oneAttack
+    InsertAttack(class: String!, input: oneAttackInput): oneAttack
   }
 `;
 
